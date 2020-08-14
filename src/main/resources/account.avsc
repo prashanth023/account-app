@@ -1,0 +1,40 @@
+{
+  "fields": [
+    {
+      "name": "accountName",
+      "type": "string"
+    },
+    {
+      "name": "accountType",
+      "type": "int"
+    },
+    {
+      "name": "marketCap",
+      "type": "int"
+    },
+    {
+      "name": "customer",
+      "type": {
+        "default": null,
+        "items": {
+          "fields": [
+            {
+              "name": "customerName",
+              "type": "string"
+            },
+            {
+              "name": "customerNum",
+              "type": "long"
+            }
+          ],
+          "name": "Customer",
+          "type": "record"
+        },
+        "type": "array"
+      }
+    }
+  ],
+  "name": "Account",
+  "namespace": "com.account.app.avro",
+  "type": "record"
+}
