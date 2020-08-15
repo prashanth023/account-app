@@ -1,12 +1,11 @@
 package com.account.app.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -17,6 +16,8 @@ import com.account.app.avro.Customer;
 import com.account.app.exception.AccountExsistedException;
 import com.account.app.exception.AccountNotFoundException;
 import com.account.app.exception.AccountServiceException;
+import com.account.app.model.AccountDto;
+import com.account.app.model.CustomerDto;
 import com.account.app.repository.AccountRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,21 +32,41 @@ public class AccountService {
 	private final NewTopic topic;
 	private final AccountRepository accountRepository;
 
-	@EventListener(ApplicationStartedEvent.class)
-	public void produce() throws InterruptedException, ExecutionException {
+	// @EventListener(ApplicationStartedEvent.class)
+	public String produce(AccountDto accDto) throws InterruptedException, ExecutionException {
 
-		final String key = "alice";
-		final Account account = Account.newBuilder().setAccountName("hjkkk").setAccountType(2).setMarketCap(12223)
-				.setCustomer(new ArrayList<Customer>()).build();
+		final String key = "account";
+		
+		List<CustomerDto> customerDtos=accDto.getCustomer() ;
+		List<Customer> customers=new ArrayList<Customer>();
+		if(customerDtos!= null) {
+			
+			Iterator<CustomerDto> it=customerDtos.iterator();
+			while(it.hasNext()) {
+				
+				CustomerDto cDt=it.next();
+				Customer customer=Customer.newBuilder()
+						.setCustomerName(cDt.getCustomerName())
+						.setCustomerNum(cDt.getCustomerNum())
+						.build();
+				customers.add(customer);
+			}
+		}
+
+		final Account account = Account.newBuilder()
+				.setAccountName(accDto.getAccountName())
+				.setAccountType(accDto.getAccountType())
+				.setMarketCap(accDto.getMarketCap())
+				.setCustomer(customers)
+				.build();
+		
 		ListenableFuture<SendResult<String, Account>> result = producer.send(topic.name(), key, account);
 		log.info(" " + result.get().getProducerRecord().value());
 
 		producer.flush();
 		log.info(" messages were produced to topic {}", topic.name());
-
+		return "account created";
 	}
-	
-	
 
 	public List<com.account.app.entity.Account> findAllAccount() {
 
@@ -86,8 +107,6 @@ public class AccountService {
 
 		return account;
 	}
-
-	
 
 	public String addAccount(com.account.app.entity.Account account) throws AccountExsistedException {
 
