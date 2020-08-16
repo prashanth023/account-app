@@ -23,13 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 public class AccountConsumer {
 
 	private final AccountRepository accountRepository;
+	private final Gson gson;
 
 	@KafkaListener(topics = "#{'${io.confluent.developer.config.topic.name}'}")
 	public void consume(final ConsumerRecord<Long, GenericData.Record> consumerRecord) {
 
 		log.info(consumerRecord.key() + "--" + consumerRecord.value() + "received {} { *********}$$$$$$$$$$$$$");
 		GenericData.Record gerericData = consumerRecord.value();
-		Gson gson = new Gson();
+		
 		log.info("converting json to object");
 		AccountDto accountDto = gson.fromJson(gerericData.toString(), AccountDto.class);
 		this.createAccount(accountDto);

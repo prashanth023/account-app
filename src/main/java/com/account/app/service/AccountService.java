@@ -37,6 +37,11 @@ public class AccountService {
 
 		final String key = "account";
 		
+		if(findByAccount(accDto.getAccountName(),accDto.getAccountType())==true) {
+			
+			return "Account already existed";
+		}
+		
 		List<CustomerDto> customerDtos=accDto.getCustomer() ;
 		List<Customer> customers=new ArrayList<Customer>();
 		if(customerDtos!= null) {
@@ -125,4 +130,14 @@ public class AccountService {
 		return status;
 	}
 
+	public boolean findByAccount(String accountName,Integer type) {
+		
+		boolean status=false;
+		com.account.app.entity.Account account=accountRepository.findByAccountNameAndAccountType(accountName, type);
+		if(account!=null) {
+			status=true;
+		}
+		return status;
+		
+	}
 }
