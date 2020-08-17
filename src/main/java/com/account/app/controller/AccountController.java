@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.account.app.entity.Account;
+import com.account.app.entity.AccountType;
 import com.account.app.model.AccountDto;
 import com.account.app.service.AccountService;
 
@@ -43,5 +44,11 @@ public class AccountController {
 	public String addAccount(@Valid @RequestBody AccountDto account) throws InterruptedException, ExecutionException {
 		
 		return accountService.produce(account);
+	}
+	
+	@GetMapping("/findTypes")
+	public List<AccountType> findAllAccTypes(){
+		
+		return accountService.findAllAccountType();
 	}
 }

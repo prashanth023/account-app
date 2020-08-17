@@ -13,12 +13,14 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import com.account.app.avro.Account;
 import com.account.app.avro.Customer;
+import com.account.app.entity.AccountType;
 import com.account.app.exception.AccountExsistedException;
 import com.account.app.exception.AccountNotFoundException;
 import com.account.app.exception.AccountServiceException;
 import com.account.app.model.AccountDto;
 import com.account.app.model.CustomerDto;
 import com.account.app.repository.AccountRepository;
+import com.account.app.repository.AccountTypeRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +33,8 @@ public class AccountService {
 	private final KafkaTemplate<String, Account> producer;
 	private final NewTopic topic;
 	private final AccountRepository accountRepository;
+	private final AccountTypeRepository accountTypeRepository;
 
-	// @EventListener(ApplicationStartedEvent.class)
 	public String produce(AccountDto accDto) throws InterruptedException, ExecutionException {
 
 		final String key = "account";
@@ -139,5 +141,10 @@ public class AccountService {
 		}
 		return status;
 		
+	}
+	
+	public List<AccountType> findAllAccountType(){
+		
+		return accountTypeRepository.findAll();
 	}
 }
